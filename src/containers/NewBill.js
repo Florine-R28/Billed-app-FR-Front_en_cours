@@ -18,27 +18,36 @@ export default class NewBill {
   handleChangeFile = e => {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
-    const formData = new FormData()
-    const email = JSON.parse(localStorage.getItem("user")).email
-    formData.append('file', file)
-    formData.append('email', email)
+    const filePath = e.target.value.split(/\\/g)/* split, on enlève les // -- tableau avec l'img en 2ieme position qui permet de récup le fileName*/
+    const fileName = filePath[filePath.length-1]/*nom du fichier directement*/
+    /* si fileName contient jpg, jpeg, png alors validé sinon ne pas accepté le fichier*/
+    const splitFileName = fileName.split('.');
+    const fileExtension = splitFileName[splitFileName.length-1]/*recup le type d'extension*/
+    const acceptedFileExtension = ["jpg", "jpeg", "png"]
 
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
-      })
-      .then(({fileUrl, key}) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      }).catch(error => console.error(error))
+    if (acceptedFileExtension.includes(fileExtension.toLowerCase())) {
+      const formData = new FormData()
+      const email = JSON.parse(localStorage.getItem("user")).email
+      formData.append('file', file)
+      formData.append('email', email)
+
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true
+          }
+        })
+        .then(({fileUrl, key}) => {
+          console.log(fileUrl)
+          this.billId = key
+          this.fileUrl = fileUrl
+          this.fileName = fileName
+        }).catch(error => console.error(error))
+    } else {
+      e.target.value = null /*mettre à zero*/
+    }
   }
   handleSubmit = e => {
     e.preventDefault()
