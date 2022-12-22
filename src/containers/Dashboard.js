@@ -5,6 +5,7 @@ import { ROUTES_PATH } from '../constants/routes.js'
 import USERS_TEST from '../constants/usersTest.js'
 import Logout from "./Logout.js"
 
+/*filter with a status*/
 export const filteredBills = (data, status) => {
   return (data && data.length) ?
     data.filter(bill => {
@@ -56,6 +57,7 @@ export const cards = (bills) => {
   return bills && bills.length ? bills.map(bill => card(bill)).join("") : ""
 }
 
+/*getstatus selon un index*/
 export const getStatus = (index) => {
   switch (index) {
     case 1:
@@ -85,25 +87,28 @@ export default class {
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
 
+  /*click on a card*/
   handleEditTicket(e, bill, bills) {
+    console.log(this.id, bill.id)
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
-    if (this.id === undefined || this.id !== bill.id) this.id = bill.id
-    if (this.counter % 2 === 0) {
+    //if (this.id === undefined || this.id !== bill.id) this.id = bill.id
+    
+    if (this.id === undefined || this.id !== bill.id) {
+      this.id = bill.id
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
-      this.counter ++
     } else {
+      this.id = undefined
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
       $('.dashboard-right-container div').html(`
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      this.counter ++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
@@ -145,7 +150,8 @@ export default class {
       this.counter ++
     }
 
-    bills.forEach(bill => {
+    /*filter selon la categorie selectionnee*/
+    filteredBills(bills, getStatus(this.index)).forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
